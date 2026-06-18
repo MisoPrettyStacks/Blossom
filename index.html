@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blossom 🌸 — free AI pipelines</title>
+  <meta name="description" content="Run AI pipelines on free API tiers. Your keys stay on your computer. Automatic failover when limits are hit." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🌸</span>
+      <div>
+        <h1>Blossom</h1>
+        <p class="tagline">Free AI pipelines · your keys stay on your computer</p>
+      </div>
+    </div>
+    <button id="open-vault" class="btn">🔑 Token Vault</button>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div id="active-providers" class="providers-hint"></div>
+
+      <label class="field-label" for="system">System prompt <span class="muted">(optional)</span></label>
+      <textarea id="system" class="textarea small" rows="2" placeholder="You are a helpful assistant.">You are a helpful assistant.</textarea>
+
+      <label class="field-label" for="prompt">Your prompt</label>
+      <textarea id="prompt" class="textarea" rows="5" placeholder="Ask anything… (Ctrl/Cmd + Enter to run)"></textarea>
+
+      <div class="run-row">
+        <button id="run-btn" class="btn primary">Run pipeline</button>
+        <button id="cancel-btn" class="btn ghost">Cancel</button>
+        <span class="hint muted">Tries each free provider in order, auto-switching on rate limits.</span>
+      </div>
+    </section>
+
+    <section id="output-card" class="card hidden">
+      <div class="output-head">
+        <h2>Result</h2>
+        <span id="output-provider" class="badge"></span>
+      </div>
+      <div id="run-log" class="run-log"></div>
+      <pre id="output" class="output"></pre>
+    </section>
+
+    <section class="card how">
+      <h2>How it works</h2>
+      <ol>
+        <li>Open the <b>Token Vault</b> and paste your own free API keys (Groq, Gemini, OpenRouter).</li>
+        <li>Keys are saved <b>only in this browser</b> (localStorage) — never uploaded anywhere.</li>
+        <li>Write a prompt and run. Blossom calls providers <b>top-to-bottom</b>.</li>
+        <li>If one is rate-limited or out of free quota, it <b>automatically fails over</b> to the next.</li>
+      </ol>
+      <p class="muted">Reorder providers in the vault to set your preferred failover priority.</p>
+    </section>
+  </main>
+
+  <footer class="footer muted">
+    Blossom 🌸 · 100% free &amp; client-side · &copy; <span id="year"></span>
+  </footer>
+
+  <!-- Token Vault drawer -->
+  <div id="overlay" class="overlay"></div>
+  <aside id="vault-panel" class="vault-panel" aria-label="Token Vault">
+    <div class="vault-header">
+      <h2>🔑 Token Vault</h2>
+      <button id="close-vault" class="icon-btn" title="Close">✕</button>
+    </div>
+    <p class="vault-intro">
+      Enter your own <b>free</b> API keys below. They're stored only on this device
+      and are sent <b>directly</b> to each provider — never to any Blossom server.
+    </p>
+    <div id="vault-list" class="vault-list"></div>
+    <div class="vault-footer">
+      <button id="clear-all" class="btn ghost small">Clear all keys</button>
+    </div>
+  </aside>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

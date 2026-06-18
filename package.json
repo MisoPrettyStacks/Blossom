@@ -1,0 +1,12 @@
+{
+  "name": "my-blossom-project",
+  "version": "1.0.0",
+  "description": "Free, client-side AI pipeline app. Bring your own free API keys (stored locally), with automatic failover across providers.",
+  "scripts": {
+    "start": "npx --yes serve@14 .",
+    "dev": "npx --yes serve@14 ."
+  },
+  "keywords": ["ai", "free", "groq", "gemini", "openrouter", "failover", "static"],
+  "license": "MIT",
+  "dependencies": {}
+}

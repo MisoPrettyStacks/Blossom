@@ -9,77 +9,156 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo">🌸</span>
-      <div>
-        <h1>Blossom</h1>
-        <p class="tagline">Free AI pipelines · your keys stay on your computer</p>
+  <div class="desktop" id="desktop">
+
+    <span class="sparkle" style="top:14%;left:28%;animation-delay:0s">✨</span>
+    <span class="sparkle" style="top:42%;left:58%;animation-delay:.5s">💫</span>
+    <span class="sparkle" style="top:22%;left:72%;animation-delay:1s">⭐</span>
+    <span class="sparkle" style="top:64%;left:44%;animation-delay:1.5s">✨</span>
+    <span class="sparkle" style="top:8%;left:82%;animation-delay:.3s">🌟</span>
+
+    <!-- Desktop icons -->
+    <div class="icon-grid">
+      <div class="desktop-icon" data-open="blossom">
+        <span class="icon-img">🌸</span>
+        <span class="icon-label">Blossom</span>
+      </div>
+      <div class="desktop-icon" data-open="vault">
+        <span class="icon-img">🔑</span>
+        <span class="icon-label">Token Vault</span>
+      </div>
+      <div class="desktop-icon" data-open="howto">
+        <span class="icon-img">📖</span>
+        <span class="icon-label">How To Use</span>
+      </div>
+      <div class="desktop-icon" data-open="about">
+        <span class="icon-img">💖</span>
+        <span class="icon-label">About</span>
       </div>
     </div>
-    <button id="open-vault" class="btn">🔑 Token Vault</button>
-  </header>
 
-  <main class="container">
-    <section class="card">
-      <div id="active-providers" class="providers-hint"></div>
-
-      <label class="field-label" for="system">System prompt <span class="muted">(optional)</span></label>
-      <textarea id="system" class="textarea small" rows="2" placeholder="You are a helpful assistant.">You are a helpful assistant.</textarea>
-
-      <label class="field-label" for="prompt">Your prompt</label>
-      <textarea id="prompt" class="textarea" rows="5" placeholder="Ask anything… (Ctrl/Cmd + Enter to run)"></textarea>
-
-      <div class="run-row">
-        <button id="run-btn" class="btn primary">Run pipeline</button>
-        <button id="cancel-btn" class="btn ghost">Cancel</button>
-        <span class="hint muted">Tries each free provider in order, auto-switching on rate limits.</span>
+    <!-- BLOSSOM (pipeline) window -->
+    <div class="win" id="win-blossom" data-title="🌸 Blossom">
+      <div class="win-titlebar tb-pink" data-drag="blossom">
+        <span>🌸 Blossom — AI Pipeline</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="blossom">_</div>
+          <div class="win-btn" data-close="blossom">✕</div>
+        </div>
       </div>
-    </section>
+      <div class="win-content">
+        <div id="active-providers" class="providers-hint"></div>
 
-    <section id="output-card" class="card hidden">
-      <div class="output-head">
-        <h2>Result</h2>
-        <span id="output-provider" class="badge"></span>
+        <label class="field-label" for="system">System prompt <span class="muted">(optional)</span></label>
+        <textarea id="system" rows="2" placeholder="You are a helpful assistant.">You are a helpful assistant.</textarea>
+
+        <label class="field-label" for="prompt">Your prompt</label>
+        <textarea id="prompt" rows="4" placeholder="Ask anything… (Ctrl/Cmd + Enter to run)"></textarea>
+
+        <div class="run-row">
+          <button id="run-btn" class="btn primary">▶ Run pipeline</button>
+          <button id="cancel-btn" class="btn small">Cancel</button>
+          <span class="hint muted">Auto-switches providers on rate limits.</span>
+        </div>
+
+        <div id="result-box" class="result-box" style="display:none;">
+          <div class="result-head">
+            <h3>💌 Result</h3>
+            <span id="output-provider" class="badge"></span>
+          </div>
+          <div id="run-log" class="run-log"></div>
+          <pre id="output" class="output"></pre>
+        </div>
       </div>
-      <div id="run-log" class="run-log"></div>
-      <pre id="output" class="output"></pre>
-    </section>
-
-    <section class="card how">
-      <h2>How it works</h2>
-      <ol>
-        <li>Open the <b>Token Vault</b> and paste your own free API keys (Groq, Gemini, OpenRouter).</li>
-        <li>Keys are saved <b>only in this browser</b> (localStorage) — never uploaded anywhere.</li>
-        <li>Write a prompt and run. Blossom calls providers <b>top-to-bottom</b>.</li>
-        <li>If one is rate-limited or out of free quota, it <b>automatically fails over</b> to the next.</li>
-      </ol>
-      <p class="muted">Reorder providers in the vault to set your preferred failover priority.</p>
-    </section>
-  </main>
-
-  <footer class="footer muted">
-    Blossom 🌸 · 100% free &amp; client-side · &copy; <span id="year"></span>
-  </footer>
-
-  <!-- Token Vault drawer -->
-  <div id="overlay" class="overlay"></div>
-  <aside id="vault-panel" class="vault-panel" aria-label="Token Vault">
-    <div class="vault-header">
-      <h2>🔑 Token Vault</h2>
-      <button id="close-vault" class="icon-btn" title="Close">✕</button>
     </div>
-    <p class="vault-intro">
-      Enter your own <b>free</b> API keys below. They're stored only on this device
-      and are sent <b>directly</b> to each provider — never to any Blossom server.
-    </p>
-    <div id="vault-list" class="vault-list"></div>
-    <div class="vault-footer">
-      <button id="clear-all" class="btn ghost small">Clear all keys</button>
-    </div>
-  </aside>
 
-  <div id="toast" class="toast"></div>
+    <!-- TOKEN VAULT window -->
+    <div class="win" id="win-vault" data-title="🔑 Token Vault">
+      <div class="win-titlebar tb-teal" data-drag="vault">
+        <span>🔑 Token Vault</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="vault">_</div>
+          <div class="win-btn" data-close="vault">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <p class="vault-intro">
+          Enter your own <b>free</b> API keys. They're stored only on this device
+          (localStorage) and sent <b>directly</b> to each provider — never to any server.
+        </p>
+        <div id="vault-list" class="vault-list"></div>
+        <div class="vault-footer">
+          <button id="clear-all" class="btn small">🗑 Clear all keys</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW TO USE window -->
+    <div class="win" id="win-howto" data-title="📖 How To Use">
+      <div class="win-titlebar tb-yellow" data-drag="howto">
+        <span>📖 How To Use</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="howto">_</div>
+          <div class="win-btn" data-close="howto">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <ol>
+          <li>Open <b>🔑 Token Vault</b> and paste at least one free API key.</li>
+          <li>Get free keys: <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Groq</a>,
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Gemini</a>,
+            <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">OpenRouter</a>.</li>
+          <li>Keys are saved <b>only in this browser</b> — never uploaded.</li>
+          <li>Open <b>🌸 Blossom</b>, type a prompt, and click <b>Run pipeline</b>.</li>
+          <li>If a provider is rate-limited, Blossom <b>auto-fails over</b> to the next.</li>
+          <li>Reorder providers in the vault with ▲ / ▼ to set failover priority.</li>
+        </ol>
+        <p class="muted" style="margin-top:8px;">Full guide: see <b>HOW_TO_USE.md</b> in the repo.</p>
+      </div>
+    </div>
+
+    <!-- ABOUT window -->
+    <div class="win" id="win-about" data-title="💖 About">
+      <div class="win-titlebar tb-purple" data-drag="about">
+        <span>💖 About Blossom</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="about">_</div>
+          <div class="win-btn" data-close="about">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <div style="font-size:34px;margin:4px 0;">🌸</div>
+        <div style="font-weight:700;margin-bottom:6px;">Blossom v1.0</div>
+        <div class="muted" style="font-size:11.5px;line-height:1.5;">
+          100% free &amp; client-side AI pipelines.<br>
+          Bring your own free keys · auto-failover · no cloud.
+        </div>
+        <div style="margin-top:10px;">
+          <a class="vault-link" href="https://github.com/misomisomisome/Blossom" target="_blank" rel="noopener">⬛ View on GitHub ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar" id="taskbar">
+      <button class="start-btn" id="start-btn">🌸 Start</button>
+      <div class="taskbar-tasks" id="taskbar-tasks"></div>
+      <div class="taskbar-clock" id="clock">12:00</div>
+    </div>
+
+    <!-- Start menu -->
+    <div class="start-menu" id="start-menu">
+      <div class="start-menu-header">🌸 Blossom OS</div>
+      <div class="menu-item" data-open="blossom">🌸 Blossom Pipeline</div>
+      <div class="menu-item" data-open="vault">🔑 Token Vault</div>
+      <div class="menu-item" data-open="howto">📖 How To Use</div>
+      <div class="menu-item" data-open="about">💖 About</div>
+      <div class="divider"></div>
+      <a class="menu-item" href="https://github.com/misomisomisome/Blossom" target="_blank" rel="noopener" style="text-decoration:none;">⬛ GitHub Repo</a>
+    </div>
+
+    <div id="toast" class="toast"></div>
+  </div>
 
   <script type="module" src="js/app.js"></script>
 </body>

@@ -258,6 +258,61 @@ textarea:focus, input:focus, select:focus { outline: none; border-color: var(--p
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* ===== Code Editor window ===== */
+#win-editor { width: 480px; left: 200px; top: 50px; }
+#win-editor .win-content { max-height: 78vh; }
+.editor-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.editor-toolbar .model-label { display: flex; align-items: center; gap: 6px; }
+.editor-toolbar select { width: auto; }
+#code-area { width: 100%; min-height: 200px; font-family: 'Courier New', monospace; font-size: 12.5px; }
+.CodeMirror {
+  border: 2px solid var(--ink); border-radius: 8px; height: 240px;
+  font-family: 'Courier New', monospace; font-size: 12.5px;
+}
+#code-console { max-height: 130px; }
+#code-output { min-height: 28px; }
+code { background: var(--soft-pink); border-radius: 4px; padding: 1px 4px; font-family: 'Courier New', monospace; font-size: 11.5px; }
+
+/* ===== Secrets window ===== */
+#win-secrets { width: 360px; left: 520px; top: 90px; }
+#win-secrets .win-content { max-height: 76vh; }
+.secrets-gate input { margin-top: 0; }
+.secrets-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.secrets-list { display: grid; gap: 7px; }
+.secret-row {
+  display: flex; align-items: center; gap: 8px; padding: 7px 9px;
+  border: 2px solid var(--ink); border-radius: 9px; background: #fff;
+}
+.secret-name { font-weight: 700; font-size: 12px; }
+.secret-val { flex: 1; font-family: 'Courier New', monospace; font-size: 11.5px; color: #6b6b7a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ===== Pipelines window ===== */
+#win-pipelines { width: 460px; left: 240px; top: 40px; }
+#win-pipelines .win-content { max-height: 80vh; }
+.pipe-bar { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.pipe-bar select { flex: 1; }
+.steps-box { display: grid; gap: 10px; margin-top: 8px; }
+.step-card { border: 2px solid var(--ink); border-radius: 12px; padding: 10px; background: #fff; box-shadow: 2px 2px 0 rgba(43,43,61,0.5); }
+.step-head { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+.step-num { font-weight: 700; font-size: 12px; background: var(--teal); border: 1.5px solid var(--ink); border-radius: 7px; padding: 2px 8px; }
+.step-row { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+.step-row input[type="text"] { flex: 1; }
+.step-hint { font-size: 10.5px; color: #6b6b7a; margin-top: 7px; }
+.step-card textarea { margin-top: 4px; }
+.code-field { font-family: 'Courier New', monospace; font-size: 11.5px; }
+.sched-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 11.5px; margin-top: 10px; color: #6b6b7a; }
+.sched-row input[type="number"] { width: 80px; }
+
+/* ===== Deploy window ===== */
+#win-deploy { width: 380px; left: 300px; top: 80px; }
+#win-deploy .win-content { max-height: 76vh; }
+.deploy-section { border-top: 2px dashed var(--pink); margin-top: 12px; padding-top: 10px; }
+.deploy-section b { font-size: 12.5px; }
+.deploy-section .btn { margin-top: 8px; margin-right: 6px; }
+.deploy-links { margin: 6px 0 0 18px; font-size: 11.5px; line-height: 1.7; }
+.deploy-links a { color: var(--pink-hot); font-weight: 700; text-decoration: none; }
+.deploy-links a:hover { text-decoration: underline; }
+
 @media (max-width: 600px) {
   .win { left: 8px !important; right: 8px; width: auto !important; max-width: calc(100vw - 16px); }
 }

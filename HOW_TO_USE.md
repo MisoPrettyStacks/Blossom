@@ -122,7 +122,52 @@ for two or three providers and you effectively multiply your free quota.
 
 ---
 
-## 7. Troubleshooting
+## 7. The other apps on the desktop
+
+Blossom is a little desktop — open these from the icons or the 🌸 Start menu.
+
+### 💻 Code Editor
+Write and **run JavaScript right in the browser**, with syntax highlighting.
+- Click **Run code** to execute. `console.log(...)` output and the function's
+  `return` value are shown below.
+- Your code runs in a **sandboxed iframe** — it can't touch the rest of Blossom.
+- When your Secrets vault is unlocked, a read-only `secrets` object is available
+  inside your code (e.g. `secrets.MY_TOKEN`).
+- Python/HTML are available for editing & highlighting; only JavaScript executes.
+
+### 🗝️ Secrets Manager
+Store API keys, tokens, and env vars beyond the three AI providers.
+1. The first time, **create a master passphrase** — this encrypts your vault.
+2. Add secrets as `NAME` → `value` (e.g. `STRIPE_KEY` → `sk_live_…`).
+3. Values are **encrypted at rest** with AES-GCM (a key derived from your
+   passphrase) and stored only on this device. They're masked in the UI.
+4. **Lock** the vault to wipe the decrypted values from memory.
+- Reference any secret inside pipelines and code as `{{NAME}}`.
+- ⚠️ There is **no recovery** — if you forget the passphrase, the data can't be
+  decrypted (that's the point of encryption).
+
+### 🔁 Pipeline Builder
+Chain multiple steps into one repeatable workflow. Each step's output feeds the
+next as `{{input}}` (or the `input` variable in code).
+- **Step types:** 🤖 AI prompt (runs through the failover chain), 🌐 HTTP request,
+  💻 Code (JavaScript).
+- Inject secrets anywhere with `{{SECRET_NAME}}`.
+- Set **Retries on failure** per step.
+- **Run pipeline** runs it once; tick **Run automatically every N seconds** to
+  schedule it (runs while the tab stays open).
+- Create multiple named pipelines with **＋** and switch between them.
+
+### 🚀 Deploy & Share
+Blossom has no server, so "deploy" means these free options:
+- **🔗 Shareable link** — encodes the pipeline config in a URL; opening it imports
+  the pipeline. Secret **values are never included.**
+- **📦 Standalone HTML** — download one self-contained `.html` that runs the
+  pipeline anywhere (the user enters their own free keys).
+- **☁️ Host the whole app free** on GitHub Pages, Netlify Drop, or Vercel.
+
+---
+
+## 8. Troubleshooting
 
 | Problem | Fix |
 |---------|-----|
@@ -134,7 +179,7 @@ for two or three providers and you effectively multiply your free quota.
 
 ---
 
-## 8. Privacy summary
+## 9. Privacy summary
 
 - ✅ Keys are stored **only** in your browser (`localStorage`).
 - ✅ Prompts and keys go **directly** to the provider you're using.

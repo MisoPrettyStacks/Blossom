@@ -55,12 +55,13 @@ export function newPipeline(name = "Untitled pipeline") {
     id: uid("pipe"),
     name,
     schedule: { enabled: false, intervalSec: 300 },
+    notify: false,
     steps: [newStep("ai")],
   };
 }
 
 export function newStep(type = "ai") {
-  const base = { id: uid("step"), type, name: "", retries: 0 };
+  const base = { id: uid("step"), type, name: "", retries: 0, condition: "" };
   if (type === "ai") return { ...base, config: { prompt: "{{input}}" } };
   if (type === "http") return { ...base, config: { method: "GET", url: "", headers: "", body: "" } };
   if (type === "code") return { ...base, config: { code: "// `input` = previous output, `secrets` = your vault\nreturn input;" } };
@@ -115,14 +116,30 @@ async function runStep(step, input, signal) {
   throw new Error(`Unknown step type: ${step.type}`);
 }
 
+// Evaluate a step's optional "run only if" condition in the sandbox.
+// The expression sees `input` (previous output) and `secrets`. Returns bool.
+async function passesCondition(step, input) {
+  const cond = (step.condition || "").trim();
+  if (!cond) return true;
+  const { result, error } = await runCode({
+    code: `return Boolean(${cond});`, input, secrets: snapshot(),
+  });
+  if (error) throw new Error(`condition error: ${error.split("\n")[0]}`);
+  return result === "true";
+}
+
 // Run a whole pipeline. onStep({ index, step, status, detail, output }).
-// status: "running" | "ok" | "error".
+// status: "running" | "ok" | "error" | "skipped".
 export async function runFlow(pipeline, { onStep, signal } = {}) {
   let input = null;
   const outputs = [];
   for (let i = 0; i < pipeline.steps.length; i++) {
     const step = pipeline.steps[i];
     onStep?.({ index: i, step, status: "running" });
+    if (!(await passesCondition(step, input))) {
+      onStep?.({ index: i, step, status: "skipped", detail: "condition false", output: input });
+      continue;
+    }
     const maxTries = (step.retries || 0) + 1;
     let lastErr = null;
     let done = false;

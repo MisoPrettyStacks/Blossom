@@ -153,8 +153,13 @@ next as `{{input}}` (or the `input` variable in code).
   💻 Code (JavaScript).
 - Inject secrets anywhere with `{{SECRET_NAME}}`.
 - Set **Retries on failure** per step.
+- **Conditional logic:** give a step a **Run only if** JavaScript expression
+  (it sees `input` and `secrets`). If it evaluates falsy, that step is skipped
+  and the previous output passes straight through — e.g. `input.length > 0`.
 - **Run pipeline** runs it once; tick **Run automatically every N seconds** to
   schedule it (runs while the tab stays open).
+- Tick **Notify me when a run fails** to get a desktop notification (or a
+  taskbar alert) whenever a run errors out.
 - Create multiple named pipelines with **＋** and switch between them.
 
 ### 🚀 Deploy & Share

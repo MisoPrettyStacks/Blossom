@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blossom 🌸 — free AI pipelines</title>
+  <meta name="description" content="Run AI pipelines on free API tiers. Your keys stay on your computer. Automatic failover when limits are hit." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- CodeMirror (syntax highlighting for the Code Editor). Degrades to a plain textarea if offline. -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+</head>
+<body>
+  <div class="desktop" id="desktop">
+
+    <span class="sparkle" style="top:14%;left:28%;animation-delay:0s">✨</span>
+    <span class="sparkle" style="top:42%;left:58%;animation-delay:.5s">💫</span>
+    <span class="sparkle" style="top:22%;left:72%;animation-delay:1s">⭐</span>
+    <span class="sparkle" style="top:64%;left:44%;animation-delay:1.5s">✨</span>
+    <span class="sparkle" style="top:8%;left:82%;animation-delay:.3s">🌟</span>
+
+    <!-- Desktop icons -->
+    <div class="icon-grid">
+      <div class="desktop-icon" data-open="blossom">
+        <span class="icon-img">🌸</span>
+        <span class="icon-label">Blossom</span>
+      </div>
+      <div class="desktop-icon" data-open="vault">
+        <span class="icon-img">🔑</span>
+        <span class="icon-label">Token Vault</span>
+      </div>
+      <div class="desktop-icon" data-open="editor">
+        <span class="icon-img">💻</span>
+        <span class="icon-label">Code Editor</span>
+      </div>
+      <div class="desktop-icon" data-open="pipelines">
+        <span class="icon-img">🔁</span>
+        <span class="icon-label">Pipelines</span>
+      </div>
+      <div class="desktop-icon" data-open="secrets">
+        <span class="icon-img">🗝️</span>
+        <span class="icon-label">Secrets</span>
+      </div>
+      <div class="desktop-icon" data-open="deploy">
+        <span class="icon-img">🚀</span>
+        <span class="icon-label">Deploy</span>
+      </div>
+      <div class="desktop-icon" data-open="howto">
+        <span class="icon-img">📖</span>
+        <span class="icon-label">How To Use</span>
+      </div>
+      <div class="desktop-icon" data-open="about">
+        <span class="icon-img">💖</span>
+        <span class="icon-label">About</span>
+      </div>
+    </div>
+
+    <!-- BLOSSOM (pipeline) window -->
+    <div class="win" id="win-blossom" data-title="🌸 Blossom">
+      <div class="win-titlebar tb-pink" data-drag="blossom">
+        <span>🌸 Blossom — AI Pipeline</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="blossom">_</div>
+          <div class="win-btn" data-close="blossom">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <div id="active-providers" class="providers-hint"></div>
+
+        <label class="field-label" for="system">System prompt <span class="muted">(optional)</span></label>
+        <textarea id="system" rows="2" placeholder="You are a helpful assistant.">You are a helpful assistant.</textarea>
+
+        <label class="field-label" for="prompt">Your prompt</label>
+        <textarea id="prompt" rows="4" placeholder="Ask anything… (Ctrl/Cmd + Enter to run)"></textarea>
+
+        <div class="run-row">
+          <button id="run-btn" class="btn primary">▶ Run pipeline</button>
+          <button id="cancel-btn" class="btn small">Cancel</button>
+          <span class="hint muted">Auto-switches providers on rate limits.</span>
+        </div>
+
+        <div id="result-box" class="result-box" style="display:none;">
+          <div class="result-head">
+            <h3>💌 Result</h3>
+            <span id="output-provider" class="badge"></span>
+          </div>
+          <div id="run-log" class="run-log"></div>
+          <pre id="output" class="output"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOKEN VAULT window -->
+    <div class="win" id="win-vault" data-title="🔑 Token Vault">
+      <div class="win-titlebar tb-teal" data-drag="vault">
+        <span>🔑 Token Vault</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="vault">_</div>
+          <div class="win-btn" data-close="vault">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <p class="vault-intro">
+          Enter your own <b>free</b> API keys. They're stored only on this device
+          (localStorage) and sent <b>directly</b> to each provider — never to any server.
+        </p>
+        <div id="vault-list" class="vault-list"></div>
+        <div class="vault-footer">
+          <button id="clear-all" class="btn small">🗑 Clear all keys</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CODE EDITOR window -->
+    <div class="win" id="win-editor" data-title="💻 Code Editor">
+      <div class="win-titlebar tb-purple" data-drag="editor">
+        <span>💻 Code Editor</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="editor">_</div>
+          <div class="win-btn" data-close="editor">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <div class="editor-toolbar">
+          <label class="model-label" style="margin:0;">Language
+            <select id="editor-lang">
+              <option value="javascript">JavaScript (runnable)</option>
+              <option value="python">Python (edit/highlight)</option>
+              <option value="htmlmixed">HTML (edit/highlight)</option>
+            </select>
+          </label>
+          <span class="hint muted">JS runs in a sandbox. <code>secrets</code> is available when your vault is unlocked.</span>
+        </div>
+        <textarea id="code-area" spellcheck="false">// Write JavaScript and click Run.
+// `secrets` holds your unlocked vault values.
+const greeting = "Hello from Blossom 🌸";
+console.log(greeting);
+return greeting.toUpperCase();</textarea>
+        <div class="run-row">
+          <button id="code-run" class="btn primary">▶ Run code</button>
+          <button id="code-clear" class="btn small">Clear output</button>
+          <span class="hint muted">Only JavaScript executes in-browser.</span>
+        </div>
+        <div id="code-console" class="run-log" style="display:none;"></div>
+        <label class="field-label" style="margin-top:10px;">Return value</label>
+        <pre id="code-output" class="output"></pre>
+      </div>
+    </div>
+
+    <!-- SECRETS window -->
+    <div class="win" id="win-secrets" data-title="🗝️ Secrets">
+      <div class="win-titlebar tb-teal" data-drag="secrets">
+        <span>🗝️ Secrets Manager</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="secrets">_</div>
+          <div class="win-btn" data-close="secrets">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <p class="vault-intro">
+          Store API keys, tokens &amp; env vars. Values are <b>encrypted at rest</b>
+          (AES-GCM) with your master passphrase, kept only on this device, and
+          referenced in pipelines/code as <code>{{NAME}}</code>.
+        </p>
+        <div id="secrets-body"></div>
+      </div>
+    </div>
+
+    <!-- PIPELINES window -->
+    <div class="win" id="win-pipelines" data-title="🔁 Pipelines">
+      <div class="win-titlebar tb-pink" data-drag="pipelines">
+        <span>🔁 Pipeline Builder</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="pipelines">_</div>
+          <div class="win-btn" data-close="pipelines">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <div class="pipe-bar">
+          <select id="pipe-select"></select>
+          <button id="pipe-new" class="icon-btn" title="New pipeline">＋</button>
+          <button id="pipe-del" class="icon-btn" title="Delete pipeline">🗑</button>
+        </div>
+        <div id="pipe-editor"></div>
+      </div>
+    </div>
+
+    <!-- DEPLOY window -->
+    <div class="win" id="win-deploy" data-title="🚀 Deploy">
+      <div class="win-titlebar tb-yellow" data-drag="deploy">
+        <span>🚀 Deploy &amp; Share</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="deploy">_</div>
+          <div class="win-btn" data-close="deploy">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <p class="vault-intro">
+          Blossom is free &amp; serverless, so "deploy" means these zero-cost options.
+          Secret <b>values</b> are never included in shares.
+        </p>
+        <label class="field-label" style="margin-top:0;">Pipeline to share</label>
+        <select id="deploy-select"></select>
+
+        <div class="deploy-section">
+          <b>🔗 Shareable link</b>
+          <p class="muted" style="font-size:11px;">Encodes the pipeline config in a URL — opening it imports the pipeline.</p>
+          <div class="field">
+            <input id="deploy-link" type="text" readonly placeholder="Generate a link…" />
+            <button id="deploy-link-btn" class="btn small primary">Make link</button>
+            <button id="deploy-copy" class="btn small">Copy</button>
+          </div>
+        </div>
+
+        <div class="deploy-section">
+          <b>📦 Standalone file</b>
+          <p class="muted" style="font-size:11px;">Download one self-contained .html that runs this pipeline anywhere.</p>
+          <button id="deploy-standalone" class="btn small primary">⬇ Download standalone HTML</button>
+          <button id="deploy-json" class="btn small">⬇ Export config (.json)</button>
+        </div>
+
+        <div class="deploy-section">
+          <b>☁️ Host the whole app free</b>
+          <ul class="deploy-links">
+            <li><a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages ↗</a> — push this repo, enable Pages</li>
+            <li><a href="https://app.netlify.com/drop" target="_blank" rel="noopener">Netlify Drop ↗</a> — drag the folder in</li>
+            <li><a href="https://vercel.com/new" target="_blank" rel="noopener">Vercel ↗</a> — import the repo</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW TO USE window -->
+    <div class="win" id="win-howto" data-title="📖 How To Use">
+      <div class="win-titlebar tb-yellow" data-drag="howto">
+        <span>📖 How To Use</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="howto">_</div>
+          <div class="win-btn" data-close="howto">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <ol>
+          <li>Open <b>🔑 Token Vault</b> and paste at least one free API key.</li>
+          <li>Get free keys: <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Groq</a>,
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Gemini</a>,
+            <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">OpenRouter</a>.</li>
+          <li>Keys are saved <b>only in this browser</b> — never uploaded.</li>
+          <li>Open <b>🌸 Blossom</b>, type a prompt, and click <b>Run pipeline</b>.</li>
+          <li>If a provider is rate-limited, Blossom <b>auto-fails over</b> to the next.</li>
+          <li>Reorder providers in the vault with ▲ / ▼ to set failover priority.</li>
+        </ol>
+        <p class="muted" style="margin-top:8px;">Full guide: see <b>HOW_TO_USE.md</b> in the repo.</p>
+      </div>
+    </div>
+
+    <!-- ABOUT window -->
+    <div class="win" id="win-about" data-title="💖 About">
+      <div class="win-titlebar tb-purple" data-drag="about">
+        <span>💖 About Blossom</span>
+        <div class="win-btns">
+          <div class="win-btn" data-min="about">_</div>
+          <div class="win-btn" data-close="about">✕</div>
+        </div>
+      </div>
+      <div class="win-content">
+        <div style="font-size:34px;margin:4px 0;">🌸</div>
+        <div style="font-weight:700;margin-bottom:6px;">Blossom v1.0</div>
+        <div class="muted" style="font-size:11.5px;line-height:1.5;">
+          100% free &amp; client-side AI pipelines.<br>
+          Bring your own free keys · auto-failover · no cloud.
+        </div>
+        <div style="margin-top:10px;">
+          <a class="vault-link" href="https://github.com/misomisomisome/Blossom" target="_blank" rel="noopener">⬛ View on GitHub ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar" id="taskbar">
+      <button class="start-btn" id="start-btn">🌸 Start</button>
+      <div class="taskbar-tasks" id="taskbar-tasks"></div>
+      <div class="taskbar-clock" id="clock">12:00</div>
+    </div>
+
+    <!-- Start menu -->
+    <div class="start-menu" id="start-menu">
+      <div class="start-menu-header">🌸 Blossom OS</div>
+      <div class="menu-item" data-open="blossom">🌸 Blossom Pipeline</div>
+      <div class="menu-item" data-open="editor">💻 Code Editor</div>
+      <div class="menu-item" data-open="pipelines">🔁 Pipeline Builder</div>
+      <div class="menu-item" data-open="secrets">🗝️ Secrets Manager</div>
+      <div class="menu-item" data-open="vault">🔑 Token Vault</div>
+      <div class="menu-item" data-open="deploy">🚀 Deploy &amp; Share</div>
+      <div class="menu-item" data-open="howto">📖 How To Use</div>
+      <div class="menu-item" data-open="about">💖 About</div>
+      <div class="divider"></div>
+      <a class="menu-item" href="https://github.com/misomisomisome/Blossom" target="_blank" rel="noopener" style="text-decoration:none;">⬛ GitHub Repo</a>
+    </div>
+
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

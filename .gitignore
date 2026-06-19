@@ -1,0 +1,13 @@
+# Never commit real secrets — keys live in the browser's localStorage, not on disk
+.env
+.env.local
+*.local
+
+# Dependencies
+node_modules/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

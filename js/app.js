@@ -524,6 +524,16 @@ function renderPipelineEditor() {
   schedRow.append(chk, el("span", {}, "Run automatically every"), interval, el("span", {}, "seconds (while tab open)"));
   wrap.append(schedRow);
 
+  const notifyRow = el("div", { className: "sched-row" });
+  const notifyChk = el("input", { type: "checkbox", id: "pipe-notify", checked: !!p.notify });
+  notifyChk.onchange = () => {
+    p.notify = notifyChk.checked;
+    saveCurrent(p);
+    if (p.notify && "Notification" in window && Notification.permission === "default") Notification.requestPermission();
+  };
+  notifyRow.append(notifyChk, el("span", {}, "Notify me when a run fails"));
+  wrap.append(notifyRow);
+
   wrap.append(el("div", { id: "pipe-log", className: "run-log", style: "display:none;margin-top:12px;" }));
   wrap.append(el("label", { className: "field-label" }, "Final output"));
   wrap.append(el("pre", { id: "pipe-output", className: "output" }));
@@ -582,6 +592,11 @@ function renderStepCard(p, step, i) {
   retryIn.onchange = () => { step.retries = Math.max(0, Number(retryIn.value) || 0); saveCurrent(p); };
   retryRow.append(el("span", { className: "step-hint", style: "margin:0;" }, "Retries on failure"), retryIn);
   card.append(retryRow);
+
+  card.append(el("div", { className: "step-hint" }, "Run only if (JS, optional) — e.g. input.length > 0. Sees `input` & `secrets`."));
+  const condIn = el("input", { type: "text", placeholder: "always runs if blank", value: step.condition || "" });
+  condIn.oninput = () => { step.condition = condIn.value; saveCurrent(p); };
+  card.append(condIn);
   return card;
 }
 
@@ -592,10 +607,11 @@ function logPipeStep({ index, step, status, detail, output }) {
   const map = {
     running: ["…", `step ${index + 1} (${step.type})${detail ? " — " + detail : ""}`],
     ok: ["✓", `step ${index + 1} ok${detail ? " — " + detail : ""}`],
+    skipped: ["↷", `step ${index + 1} skipped — ${detail}`],
     error: ["✕", `step ${index + 1} failed: ${detail}`],
   };
   const [icon, text] = map[status] || ["•", `${status}`];
-  const cls = status === "ok" ? "success" : status === "error" ? "failed" : "trying";
+  const cls = status === "ok" ? "success" : status === "error" ? "failed" : status === "skipped" ? "skipped" : "trying";
   log.append(el("div", { className: `log-line ${cls}` }, el("span", { className: "log-icon" }, icon), el("span", {}, "> " + text)));
   log.scrollTop = log.scrollHeight;
 }
@@ -619,7 +635,7 @@ async function runCurrentPipeline() {
     $("#pipe-output").textContent = typeof finalOutput === "string" ? finalOutput : JSON.stringify(finalOutput, null, 2);
   } catch (e) {
     if (e.name === "AbortError") flash("Pipeline cancelled");
-    else $("#pipe-output").append(el("div", { className: "error-box" }, e.message));
+    else { $("#pipe-output").append(el("div", { className: "error-box" }, e.message)); notifyFailure(p, e); }
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = "▶ Run pipeline"; }
     pipeController = null;
@@ -637,7 +653,19 @@ async function scheduledTick(p) {
     }
   } catch (e) {
     flash(`⏰ ${p.name} failed: ${e.message}`);
+    notifyFailure(p, e);
   }
+}
+
+// Failure notification — desktop notification if the user opted in & granted
+// permission, otherwise a taskbar flash. Never includes secret values.
+function notifyFailure(p, err) {
+  if (!p?.notify) return;
+  const body = `${p.name} failed: ${err.message}`;
+  if ("Notification" in window && Notification.permission === "granted") {
+    try { new Notification("🌸 Blossom pipeline failed", { body }); return; } catch {}
+  }
+  flash("⚠️ " + body);
 }
 
 /* ============================ Deploy & Share ============================ */
